@@ -2,6 +2,7 @@ package com.giraone.io.copier.web;
 
 import com.giraone.io.copier.AbstractFileTreeProvider;
 import com.giraone.io.copier.FileTreeProvider;
+import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.model.FileTree;
 import com.giraone.io.copier.web.index.AutoIndexItem;
 import com.giraone.io.copier.web.index.AutoIndexItemType;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * A {@link FileTreeProvider} provided by a web server using JSON index files.
@@ -27,10 +29,17 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
     private static final AutoIndexReader autoIndexReader = new AutoIndexReader();
 
     private final URL rootUrl;
+    private Function<SourceFile, Boolean> sourceFileFilterFunction = null;
     private final List<AutoIndexItem> children = null;
 
     public WebServerFileTreeProvider(URL rootUrl) {
         this.rootUrl = rootUrl;
+    }
+
+    @Override
+    public FileTreeProvider<WebServerFile> withFilter(Function<SourceFile, Boolean> sourceFileFilterFunction) {
+        this.sourceFileFilterFunction = sourceFileFilterFunction;
+        return this;
     }
 
     @Override
@@ -59,9 +68,11 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
             final URL childUrl = childUrl(url, child.getName(), child.isDirectory());
             final WebServerFile childFile = new WebServerFile(childUrl, child.getName(), child.isDirectory());
             final FileTree.FileTreeNode<WebServerFile> childFileTreeNode = new FileTree.FileTreeNode<>(childFile, fileTreeNode);
-            fileTreeNode.addChild(childFileTreeNode);
-            if (child.getType() == AutoIndexItemType.directory) {
-                provideTreeFromAutoIndex(childUrl, childFileTreeNode);
+            if (sourceFileFilterFunction == null || sourceFileFilterFunction.apply(childFile)) {
+                fileTreeNode.addChild(childFileTreeNode);
+                if (child.getType() == AutoIndexItemType.directory) {
+                    provideTreeFromAutoIndex(childUrl, childFileTreeNode);
+                }
             }
         });
     }

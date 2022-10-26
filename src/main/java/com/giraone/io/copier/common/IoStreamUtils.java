@@ -1,18 +1,18 @@
-package com.giraone.io.copier.copy;
+package com.giraone.io.copier.common;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A class to stream byte content from InputStream, OutputStreams and Files.
+ * A class to stream byte content from InputStream/OutputStreams.
  */
-public final class IoStreamUtil {
+public final class IoStreamUtils {
 
     private static final int BUFFER_SIZE = 4096;
 
     // Class has only static methods
-    private IoStreamUtil() {
+    private IoStreamUtils() {
     }
 
     public static long pipeBlobStream(InputStream in, OutputStream out) throws IOException {

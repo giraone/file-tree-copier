@@ -2,6 +2,8 @@ package com.giraone.io.copier.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.giraone.io.copier.AbstractSourceFile;
+import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.model.FileTree;
 import com.giraone.io.copier.web.index.AutoIndexItem;
 import com.giraone.io.copier.web.index.AutoIndexItemType;
@@ -14,12 +16,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +34,7 @@ import static org.mockserver.model.HttpResponse.response;
 
 class WebServerFileTreeProviderTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebServerFileTreeProviderTest.class);
     private static final int PORT_FOR_MOCKSERVER = 18787;
     private static final String URL_root = "/";
 
@@ -64,7 +70,7 @@ class WebServerFileTreeProviderTest {
         URL rootUrl = new URL(rootUrlString);
         WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
         URL fileUrl = new URL(fileUrlString);
-        String name = WebServerFile.lastPart(fileUrlString);
+        String name = AbstractSourceFile.lastPart(fileUrlString);
         WebServerFile fileTreeNode = new WebServerFile(fileUrl, name, false);
         // act
         String relativeTargetFilePath = fileTreeProvider.calculateRelativeTargetFilePath(fileTreeNode);
@@ -93,7 +99,7 @@ class WebServerFileTreeProviderTest {
     }
 
     @Test
-    void provideTreeFromAutoIndex() throws MalformedURLException {
+    void provideTreeFromAutoIndexWithoutFilter() throws MalformedURLException {
 
         // arrange
         createMockForAutoIndex(URL_root, 0, 1, 1);
@@ -116,6 +122,33 @@ class WebServerFileTreeProviderTest {
         assertThat(dir1.getData().getUrl()).isNotNull();
         assertThat(dir1.getData().getUrl().toExternalForm()).isEqualTo(rootUrl + "/folder1/");
         assertThat(dir1.getData().getName()).isEqualTo("folder1");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "4,file1,1",
+        "10,file1,2",
+    })
+    void provideTreeFromAutoIndexWithFilter(int filesLevel1, String fileContains, int expectedCount) throws MalformedURLException {
+
+        // arrange
+        createMockForAutoIndex(URL_root, filesLevel1, 0, 0);
+        URL rootUrl = new URL("http://127.0.0.1:" + PORT_FOR_MOCKSERVER);
+        WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
+        Function<SourceFile, Boolean> fct = sourceFile -> {
+            boolean ret = sourceFile.isDirectory() || sourceFile.getName().contains(fileContains);
+            LOGGER.debug("Applied sourceFileFileFunction for {} returns {}", sourceFile, ret);
+            return ret;
+        };
+        fileTreeProvider.withFilter(fct);
+        WebServerFile file = new WebServerFile(rootUrl);
+        final FileTree.FileTreeNode<WebServerFile> fileTreeNode = new FileTree.FileTreeNode<>(file, null);
+        // act
+        fileTreeProvider.provideTreeFromAutoIndex(rootUrl, fileTreeNode);
+        // assert
+        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.traverse().collect(Collectors.toList());
+        assertThat(rootList).hasSize(expectedCount);
+
     }
 
     //------------------------------------------------------------------------------------------------------------------

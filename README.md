@@ -17,7 +17,9 @@ public class HowToCopy
         
         URL url = new URL("https://my-nginx-server/public/");
         WebServerFileTreeProvider source = new WebServerFileTreeProvider(url);
-
+        // Optional filter for traversal on source files, e.g. name filter for file extensions
+        source.withFilter(sourceFile -> sourceFile.isDirectory() || sourceFile.getName().endsWith(".css"));
+        
         FileTreeCopier<WebServerFile> fileTreeCopier = new FileTreeCopier<>();
         fileTreeCopier.withFileTreeProvider(source);
         File target = new File("/tmp/download");

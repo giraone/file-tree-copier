@@ -1,5 +1,6 @@
 package com.giraone.io.copier.copy;
 
+import com.giraone.io.copier.common.IoStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class FileCopy {
         LOGGER.info("OPEN URL \"{}\"", url);
         try (OutputStream out = new FileOutputStream(file)) {
             try (InputStream in = url.openStream()) {
-                long copied = IoStreamUtil.pipeBlobStream(in, out);
+                long copied = IoStreamUtils.pipeBlobStream(in, out);
                 LOGGER.debug("Copied URL \"{}\" with {} bytes to file \"{}\"", url, copied, file);
             }
         }

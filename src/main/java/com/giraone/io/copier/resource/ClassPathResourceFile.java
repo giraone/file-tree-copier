@@ -1,20 +1,29 @@
 package com.giraone.io.copier.resource;
 
 import com.giraone.io.copier.AbstractSourceFile;
+import com.giraone.io.copier.common.ClassUtils;
+import com.giraone.io.copier.common.ResourceUtils;
 
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 public class ClassPathResourceFile extends AbstractSourceFile {
 
     private final String resourcePath;
     private final boolean directory;
+    private final ClassLoader classLoader;
 
     public ClassPathResourceFile(String resourcePath) {
         this(resourcePath, null, true);
     }
 
     public ClassPathResourceFile(String resourcePath, String name, boolean directory) {
+        this(ClassPathResourceFile.class.getClassLoader(), resourcePath, name, directory);
+    }
+
+    public ClassPathResourceFile(ClassLoader classLoader, String resourcePath, String name, boolean directory) {
         super(name);
+        this.classLoader = classLoader;
         this.resourcePath = resourcePath;
         this.directory = directory;
     }
@@ -25,12 +34,16 @@ public class ClassPathResourceFile extends AbstractSourceFile {
 
     @Override
     public boolean isDirectory() {
-        return false;
+        return directory;
     }
 
     @Override
     public URL getUrl() {
-        return null; // TODO
+        try {
+            return ResourceUtils.getURL(resourcePath);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
