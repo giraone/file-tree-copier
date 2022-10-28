@@ -15,8 +15,8 @@ class IoStreamUtilsTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "classpath:test-data/tree2/medium.jpg,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "classpath:test-data/tree2/large.png,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "classpath:test-data/tree2/medium.jpg,84a4da0e4c52c469ace6e0c674a9144cd43eb2628c401c8b56b41242e2be4af1",
+        "classpath:test-data/tree2/large.png,13d64eddbc87182428e2ecae7a1f40685fe1232ffc96748ee394e8ac2df3f4e1",
     })
     void calculateChecksumString(String resource, String expected) throws NoSuchAlgorithmException, IOException {
 

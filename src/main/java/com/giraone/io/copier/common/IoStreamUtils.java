@@ -35,13 +35,13 @@ public final class IoStreamUtils {
      * Calculate checksum of an InputStream, e.g. FileInputStream
      *
      * @param digest the checksum algorithm
-     * @param in the input stream t oread from - will be closed
+     * @param in the input stream to read from - will be closed
      * @return the checksum as a String
-     * @throws IOException
+     * @throws IOException when input cannot be read
      */
     public static byte[] calculateChecksum(MessageDigest digest, InputStream in) throws IOException {
         byte[] byteArray = new byte[BUFFER_SIZE];
-        int readBytes = 0;
+        int readBytes;
         try (in) {
             while ((readBytes = in.read(byteArray)) != -1) {
                 digest.update(byteArray, 0, readBytes);
@@ -56,14 +56,14 @@ public final class IoStreamUtils {
      * @param digest the checksum algorithm
      * @param in the input stream t oread from - will be closed
      * @return the checksum as a String
-     * @throws IOException
+     * @throws IOException when input cannot be read
      */
     public static String calculateChecksumString(MessageDigest digest, InputStream in) throws IOException {
 
-        byte[] bytes = digest.digest();
+        byte[] bytes = calculateChecksum(digest, in);
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        for (byte aByte : bytes) {
+            sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
         return sb.toString();
     }
