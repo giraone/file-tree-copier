@@ -8,6 +8,8 @@ package com.giraone.io.copier.web.index;
 ]
  */
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AutoIndexItem {
     private String name;
     private AutoIndexItemType type;
@@ -39,6 +41,7 @@ public class AutoIndexItem {
         this.type = type;
     }
 
+    @JsonIgnore
     public boolean isDirectory() {
         return type == AutoIndexItemType.directory;
     }
