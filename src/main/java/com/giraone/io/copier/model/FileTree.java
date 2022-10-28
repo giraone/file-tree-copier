@@ -44,7 +44,14 @@ public class FileTree<T extends SourceFile> {
             children.add(child);
         }
 
+        public boolean hasChildren() {
+            return children != null;
+        }
+
         public Stream<FileTreeNode<T>> traverse() {
+            if (children == null) {
+                throw new IllegalStateException("Node has " + data + " has no children!");
+            }
             return children.stream();
         }
     }

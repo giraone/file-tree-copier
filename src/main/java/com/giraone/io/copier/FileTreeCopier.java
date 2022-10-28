@@ -34,27 +34,25 @@ public class FileTreeCopier<T extends SourceFile> {
         return this;
     }
 
-    // TODO: Statistic-Object
-    public int copy() {
+    public CopierResult copy() {
 
         FileTree<T> sourceTree = this.fileTreeProvider.provideTree();
         return copy(sourceTree);
     }
 
-    protected int copy(FileTree<T> sourceTree) {
+    protected CopierResult copy(FileTree<T> sourceTree) {
 
-        Stream<FileTree.FileTreeNode<T>> stream = sourceTree.traverse();
-        AtomicInteger count = new AtomicInteger(0);
+        final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.traverse();
+        final CopierResult copierResult = new CopierResult();
         stream.forEach(node -> {
-            int copied = copy(node);
-            count.getAndAdd(copied);
+            copy(node, copierResult);
         });
 
-        return count.get();
+        return copierResult;
     }
 
-    protected int copy(FileTree.FileTreeNode<T> node) {
-        AtomicInteger count = new AtomicInteger();
+    protected void copy(FileTree.FileTreeNode<T> node, CopierResult copierResult) {
+
         final T nodeData = node.getData();
         final String targetFilePath = fileTreeProvider.calculateRelativeTargetFilePath(nodeData);
         if (targetFilePath == null) {
@@ -66,18 +64,18 @@ public class FileTreeCopier<T extends SourceFile> {
             if (!ok) {
                 throw new RuntimeException("Cannot create temp directory \"" + targetFile + "\"!");
             }
+            copierResult.directoryCreated();
             node.traverse().forEach(childNode -> {
-                count.getAndAdd(copy(childNode));
+                copy(childNode, copierResult);
             });
         } else {
             final URL url = node.getData().getUrl();
             try {
-                FileCopy.copyUrlContentToFile(url, targetFile);
-                count.getAndIncrement();
+                final long bytesCopied = FileCopy.copyUrlContentToFile(url, targetFile);
+                copierResult.fileCopied(bytesCopied);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return count.get();
     }
 }
