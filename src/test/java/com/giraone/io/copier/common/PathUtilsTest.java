@@ -14,6 +14,7 @@ class PathUtilsTest {
         "file.jpg,file.jpg",
         "dir/dir2,dir2",
         "dir/dir2/,dir2",
+        ","
     })
     void getFileName(String path, String expected) {
 
