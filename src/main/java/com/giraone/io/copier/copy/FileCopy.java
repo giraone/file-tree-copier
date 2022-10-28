@@ -19,13 +19,14 @@ public class FileCopy {
     private FileCopy() {
     }
 
-    public static void copyUrlContentToFile(URL url, File file) throws IOException {
+    public static long copyUrlContentToFile(URL url, File file) throws IOException {
 
         LOGGER.info("OPEN URL \"{}\"", url);
         try (OutputStream out = new FileOutputStream(file)) {
             try (InputStream in = url.openStream()) {
-                long copied = IoStreamUtils.pipeBlobStream(in, out);
-                LOGGER.debug("Copied URL \"{}\" with {} bytes to file \"{}\"", url, copied, file);
+                long bytesCopied = IoStreamUtils.pipeBlobStream(in, out);
+                LOGGER.debug("Copied URL \"{}\" with {} bytes to file \"{}\"", url, bytesCopied, file);
+                return bytesCopied;
             }
         }
     }
