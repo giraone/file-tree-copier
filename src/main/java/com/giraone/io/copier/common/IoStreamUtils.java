@@ -3,6 +3,7 @@ package com.giraone.io.copier.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
 
 /**
  * A class to stream byte content from InputStream/OutputStreams.
@@ -28,5 +29,42 @@ public final class IoStreamUtils {
             size += bytesRead;
         }
         return size;
+    }
+
+    /**
+     * Calculate checksum of an InputStream, e.g. FileInputStream
+     *
+     * @param digest the checksum algorithm
+     * @param in the input stream t oread from - will be closed
+     * @return the checksum as a String
+     * @throws IOException
+     */
+    public static byte[] calculateChecksum(MessageDigest digest, InputStream in) throws IOException {
+        byte[] byteArray = new byte[BUFFER_SIZE];
+        int readBytes = 0;
+        try (in) {
+            while ((readBytes = in.read(byteArray)) != -1) {
+                digest.update(byteArray, 0, readBytes);
+            }
+        }
+        return digest.digest();
+    }
+
+    /**
+     * Calculate checksum of an InputStream, e.g. FileInputStream
+     *
+     * @param digest the checksum algorithm
+     * @param in the input stream t oread from - will be closed
+     * @return the checksum as a String
+     * @throws IOException
+     */
+    public static String calculateChecksumString(MessageDigest digest, InputStream in) throws IOException {
+
+        byte[] bytes = digest.digest();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
 }
