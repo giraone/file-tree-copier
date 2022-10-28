@@ -4,18 +4,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Miscellaneous classpath resource utility methods inspired by org.springframework.util.ResourceUtils.
  */
 public class ResourceUtils {
 
-    /** Pseudo prefix for loading from the class path: "classpath:". */
+    /**
+     * Pseudo prefix for loading from the class path: "classpath:".
+     */
     public static final String CLASSPATH_URL_PREFIX = "classpath:";
-    /** URL protocol for an entry from a jar file: "jar". */
+    /**
+     * URL protocol for an entry from a jar file: "jar".
+     */
     public static final String URL_PROTOCOL_JAR = "jar";
 
     public static URL getURL(String resource) throws FileNotFoundException {
@@ -33,8 +34,7 @@ public class ResourceUtils {
         try {
             // try URL
             return new URL(resource);
-        }
-        catch (MalformedURLException malformedURLException) {
+        } catch (MalformedURLException malformedURLException) {
             // no URL -> treat as file path
             try {
                 final File file = new File(resource);
@@ -42,25 +42,9 @@ public class ResourceUtils {
                     throw new FileNotFoundException("Resource \"" + resource + "\" is neither a URL nor an existing file!");
                 }
                 return file.toURI().toURL();
-            }
-            catch (MalformedURLException malformedURLException2) {
+            } catch (MalformedURLException malformedURLException2) {
                 throw new FileNotFoundException("Resource \"" + resource + "\" is neither a valid URL nor a file system path!");
             }
         }
-    }
-
-    public static Set<URL> getURLs(String resource) throws Exception{
-
-        if (resource.startsWith(CLASSPATH_URL_PREFIX)) {
-            resource = resource.substring(CLASSPATH_URL_PREFIX.length());
-        }
-        final Set<URL> result = new LinkedHashSet<>(16);
-        final ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
-        final Enumeration<URL> resourceUrls = classLoader.getResources(resource);
-        while (resourceUrls.hasMoreElements()) {
-            URL url = resourceUrls.nextElement();
-            result.add(url);
-        }
-        return result;
     }
 }
