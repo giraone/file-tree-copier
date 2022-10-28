@@ -65,11 +65,14 @@ class WebServerFileTreeProviderTest {
 
     @ParameterizedTest
     @CsvSource({
-        "2,0,0,2",
-        "0,2,0,2",
-        "2,2,0,4",
+        "2,0,0,2,0",
+        "0,2,0,2,0",
+        "2,2,0,4,0",
+        "2,2,2,4,4",
+        "2,4,3,6,12",
     })
-    void provideTree(int filesLevel1, int dirsLevel1, int filesLevel2, int expectedChildrenLevel1) throws MalformedURLException {
+    void provideTree(int filesLevel1, int dirsLevel1, int filesLevel2,
+                     int expectedChildrenLevel1, int expectedChildrenLevel2) throws MalformedURLException {
 
         // arrange
         URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
@@ -81,8 +84,16 @@ class WebServerFileTreeProviderTest {
         FileTree<WebServerFile> relativeTargetFilePath = fileTreeProvider.provideTree();
         // assert
         assertThat(relativeTargetFilePath).isNotNull();
-        List<FileTree.FileTreeNode<WebServerFile>> list = relativeTargetFilePath.traverse().collect(Collectors.toList());
-        assertThat(list).hasSize(expectedChildrenLevel1);
+        List<FileTree.FileTreeNode<WebServerFile>> list1 = relativeTargetFilePath.traverse().collect(Collectors.toList());
+        assertThat(list1).hasSize(expectedChildrenLevel1);
+        int count = 0;
+        for (FileTree.FileTreeNode<WebServerFile> item2: list1) {
+            if (item2.hasChildren()) {
+                List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.traverse().collect(Collectors.toList());
+                count += list2.size();
+            }
+        }
+        assertThat(count).isEqualTo(expectedChildrenLevel2);
     }
 
     @Test

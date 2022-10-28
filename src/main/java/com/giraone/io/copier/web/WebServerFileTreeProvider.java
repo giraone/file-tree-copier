@@ -30,7 +30,6 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
 
     private final URL rootUrl;
     private Function<SourceFile, Boolean> sourceFileFilterFunction = null;
-    private final List<AutoIndexItem> children = null;
 
     public WebServerFileTreeProvider(URL rootUrl) {
         this.rootUrl = rootUrl;
@@ -48,8 +47,7 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
         final WebServerFile rootFile = new WebServerFile(rootUrl);
         final FileTree.FileTreeNode<WebServerFile> fileTreeNode = new FileTree.FileTreeNode<>(rootFile, null);
         provideTreeFromAutoIndex(rootUrl, fileTreeNode);
-        final FileTree<WebServerFile> ret = new FileTree<>(fileTreeNode);
-        return ret;
+        return new FileTree<>(fileTreeNode);
     }
 
     @Override
