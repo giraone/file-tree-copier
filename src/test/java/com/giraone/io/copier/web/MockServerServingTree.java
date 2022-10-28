@@ -26,6 +26,7 @@ public class MockServerServingTree extends ClientAndServer {
         super();
     }
 
+    @SuppressWarnings("try")
     public void startClientAndServer() {
         startClientAndServer(PORT_FOR_MOCKSERVER);
     }
@@ -57,7 +58,7 @@ public class MockServerServingTree extends ClientAndServer {
         }
     }
 
-    private String createMockEndpoint(String urlPath, List<AutoIndexItem> lst) {
+    private void createMockEndpoint(String urlPath, List<AutoIndexItem> lst) {
         String jsonBody;
         try {
             jsonBody = objectMapper.writeValueAsString(lst);
@@ -65,9 +66,9 @@ public class MockServerServingTree extends ClientAndServer {
             throw new RuntimeException(e);
         }
         createMockEndpoint(urlPath, jsonBody);
-        return jsonBody;
     }
 
+    @SuppressWarnings("try")
     private void createMockEndpoint(String urlPath, String jsonBody) {
 
         new MockServerClient("127.0.0.1", PORT_FOR_MOCKSERVER)
