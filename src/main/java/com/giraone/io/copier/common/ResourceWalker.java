@@ -24,6 +24,7 @@ public class ResourceWalker {
     /**
      * Walk through a given resource tree. The walk always starts with the resource itself!
      * So directory with 2 entries, will have 3 nodes!
+     *
      * @param resource the resource to start.
      * @param maxDepth walking depth, must be greater or equal 1
      * @param consumer the consumer process to consume the tree nodes
@@ -52,7 +53,7 @@ public class ResourceWalker {
                     .map(Path::toFile)
                     .forEach(consumer);
             } else {
-                throw new FileNotFoundException("File for resource \"" + resource + "\", uri=\""+ uri + "\" does not exist!");
+                throw new FileNotFoundException("File for resource \"" + resource + "\", uri=\"" + uri + "\" does not exist!");
             }
         }
     }

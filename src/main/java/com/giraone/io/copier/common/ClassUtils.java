@@ -13,6 +13,7 @@ public class ClassUtils {
      * </ul>
      * Call this method if you intend to use the thread context ClassLoader in a scenario where you clearly prefer a non-null
      * ClassLoader reference: for example, for class path resource loading.
+     *
      * @return a class loader or null
      */
     public static ClassLoader getDefaultClassLoader() {
@@ -20,8 +21,7 @@ public class ClassUtils {
         ClassLoader ret = null;
         try {
             ret = Thread.currentThread().getContextClassLoader();
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             // Cannot get thread context ClassLoader - using fallback...
         }
         if (ret == null) {
@@ -31,8 +31,7 @@ public class ClassUtils {
                 // getClassLoader() returning null indicates the bootstrap ClassLoader.
                 try {
                     ret = ClassLoader.getSystemClassLoader();
-                }
-                catch (Throwable ex) {
+                } catch (Throwable ex) {
                     // Cannot access system ClassLoader - the caller must live with null.
                 }
             }

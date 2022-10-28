@@ -6,15 +6,12 @@ import com.giraone.io.copier.model.FileTree;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class FileTreeCopier<T extends SourceFile> {
 
     private FileTreeProvider<T> fileTreeProvider;
     private File targetDirectory;
-    private boolean flattenTree = false;
-    private boolean stopOnErrors = false;
 
     public FileTreeCopier() {
     }
@@ -29,11 +26,6 @@ public class FileTreeCopier<T extends SourceFile> {
         return this;
     }
 
-    public FileTreeCopier withFlattenTree(boolean flattenTree) {
-        this.flattenTree = flattenTree;
-        return this;
-    }
-
     public CopierResult copy() {
 
         FileTree<T> sourceTree = this.fileTreeProvider.provideTree();
@@ -44,9 +36,7 @@ public class FileTreeCopier<T extends SourceFile> {
 
         final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.traverse();
         final CopierResult copierResult = new CopierResult();
-        stream.forEach(node -> {
-            copy(node, copierResult);
-        });
+        stream.forEach(node -> copy(node, copierResult));
 
         return copierResult;
     }
@@ -65,9 +55,7 @@ public class FileTreeCopier<T extends SourceFile> {
                 throw new RuntimeException("Cannot create temp directory \"" + targetFile + "\"!");
             }
             copierResult.directoryCreated();
-            node.traverse().forEach(childNode -> {
-                copy(childNode, copierResult);
-            });
+            node.traverse().forEach(childNode -> copy(childNode, copierResult));
         } else {
             final URL url = node.getData().getUrl();
             try {

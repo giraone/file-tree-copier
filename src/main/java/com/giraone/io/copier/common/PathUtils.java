@@ -9,6 +9,7 @@ public class PathUtils {
      * Returns the name of the file or directory denoted by this path structure.
      * The file name is the <em>farthest</em> element from the root in the directory hierarchy.
      * If the {@code path} ends with a slash (/) it is ignored and stripped of.
+     *
      * @param path the input path as a string
      * @return a path representing the name of the file or directory, or {@code path} itself if
      * the input is null or the empty string.
@@ -33,6 +34,7 @@ public class PathUtils {
      * so the file extension of "image.png" is ".png", not "png".
      * If the given input has only one dot (.) at position 0, this is not considered as a file extension!
      * If the given input has a dot (.) at the last position, "." is returned.
+     *
      * @param path the input path
      * @return an extension, if available, null else
      */

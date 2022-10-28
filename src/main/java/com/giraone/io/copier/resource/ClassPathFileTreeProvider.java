@@ -10,7 +10,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPathResourceFile> {
@@ -29,7 +28,7 @@ public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPat
     }
 
     @Override
-    public FileTree provideTree() {
+    public FileTree<ClassPathResourceFile> provideTree() {
 
         ClassPathResourceFile rootFile = new ClassPathResourceFile(this.rootResourcePath);
         final FileTree.FileTreeNode<ClassPathResourceFile> fileTreeNode = new FileTree.FileTreeNode<>(rootFile, null);

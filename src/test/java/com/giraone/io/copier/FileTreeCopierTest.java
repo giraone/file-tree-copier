@@ -26,11 +26,11 @@ class FileTreeCopierTest {
 
     @BeforeAll
     static void setup() {
-        mockServerServingTree.startClientAndServer();
+        MockServerServingTree.startClientAndServer();
     }
 
     @AfterAll
-    public static void stopServer() {
+    static void stopServer() {
         mockServerServingTree.stop();
     }
 
@@ -44,7 +44,7 @@ class FileTreeCopierTest {
 
         // arrange
         URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
-        String rootPath = "copyUsingWebServerFileTreeProvider/2-2-2/";
+        String rootPath = "/copyUsingWebServerFileTreeProvider/2-2-2/";
         URL rootUrl = new URL(rootUrlHostAndPort + rootPath);
         mockServerServingTree.createMockForAutoIndex(rootPath, 2, 2, 2);
         WebServerFileTreeProvider source = new WebServerFileTreeProvider(rootUrl);
@@ -60,12 +60,25 @@ class FileTreeCopierTest {
         long end = System.currentTimeMillis();
         LOGGER.info("Copying of {} directories, {} files, {} bytes took {} msecs",
             copierResult.getDirectoriesCreated(), copierResult.getFilesCopied(),
-            copierResult.getBytesCopied(), end-start);
+            copierResult.getBytesCopied(), end - start);
+
+        /*
+        │   file1.txt
+        │   file2.txt
+        │
+        ├───folder1
+        │       folder1-file1.txt
+        │       folder1-file2.txt
+        │
+        └───folder2
+                folder2-file1.txt
+                folder2-file2.txt
+        */
 
         // assert
-        assertThat(copierResult.getDirectoriesCreated()).isEqualTo(1);
-        assertThat(copierResult.getFilesCopied()).isEqualTo(40);
-        assertThat(copierResult.getBytesCopied()).isEqualTo(9);
+        assertThat(copierResult.getDirectoriesCreated()).isEqualTo(2);
+        assertThat(copierResult.getFilesCopied()).isEqualTo(6);
+        assertThat(copierResult.getBytesCopied()).isEqualTo(86L);
 
         // clean up
         deleteDirectory(tmpDir);
@@ -88,7 +101,7 @@ class FileTreeCopierTest {
         long end = System.currentTimeMillis();
         LOGGER.info("Copying of {} directories, {} files, {} bytes took {} msecs",
             copierResult.getDirectoriesCreated(), copierResult.getFilesCopied(),
-            copierResult.getBytesCopied(), end-start);
+            copierResult.getBytesCopied(), end - start);
 
         /*
         │   file1.txt

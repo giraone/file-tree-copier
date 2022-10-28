@@ -2,13 +2,9 @@ package com.giraone.io.copier.resource;
 
 import com.giraone.io.copier.AbstractSourceFile;
 import com.giraone.io.copier.model.FileTree;
-import com.giraone.io.copier.web.WebServerFile;
-import com.giraone.io.copier.web.WebServerFileTreeProvider;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +18,7 @@ class ClassPathFileTreeProviderTest {
         "resource-root/start/,resource-root/start/file.txt,file.txt",
         "resource-root,resource-root/start/file.txt,start/file.txt",
     })
-    void calculateRelativeTargetFilePath(String resourceRoot, String resourcePath, String expected) throws MalformedURLException {
+    void calculateRelativeTargetFilePath(String resourceRoot, String resourcePath, String expected) {
 
         // arrange
         ClassPathFileTreeProvider fileTreeProvider = new ClassPathFileTreeProvider(resourceRoot);
@@ -36,7 +32,8 @@ class ClassPathFileTreeProviderTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "/test-data/tree1/,1",
+        "classpath:test-data/tree1/,3",
+        "classpath:test-data/tree1/dir1/,4",
     })
     void provideTree(String resourceRoot, int expectedChildrenLevel1) {
 

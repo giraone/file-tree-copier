@@ -28,11 +28,11 @@ class WebServerFileTreeProviderTest {
 
     @BeforeAll
     static void setup() {
-        mockServerServingTree.startClientAndServer();
+        MockServerServingTree.startClientAndServer();
     }
 
     @AfterAll
-    public static void stopServer() {
+    static void stopServer() {
         mockServerServingTree.stop();
     }
 
@@ -87,7 +87,7 @@ class WebServerFileTreeProviderTest {
         List<FileTree.FileTreeNode<WebServerFile>> list1 = relativeTargetFilePath.traverse().collect(Collectors.toList());
         assertThat(list1).hasSize(expectedChildrenLevel1);
         int count = 0;
-        for (FileTree.FileTreeNode<WebServerFile> item2: list1) {
+        for (FileTree.FileTreeNode<WebServerFile> item2 : list1) {
             if (item2.hasChildren()) {
                 List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.traverse().collect(Collectors.toList());
                 count += list2.size();

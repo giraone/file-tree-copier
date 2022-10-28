@@ -13,10 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class AutoIndexItem {
     private String name;
     private AutoIndexItemType type;
-    // private LocalDateTime mtime;
-    // private int size;
 
     // Needed for Jackson
+    @SuppressWarnings("unused")
     public AutoIndexItem() {
     }
 
@@ -37,6 +36,7 @@ public class AutoIndexItem {
         return type;
     }
 
+    @SuppressWarnings("unused")
     public void setType(AutoIndexItemType type) {
         this.type = type;
     }

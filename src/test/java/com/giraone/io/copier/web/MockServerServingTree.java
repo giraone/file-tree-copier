@@ -23,16 +23,11 @@ public class MockServerServingTree extends ClientAndServer {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MockServerServingTree() {
-        super();
-    }
-
-    @SuppressWarnings("try")
-    public void startClientAndServer() {
-        startClientAndServer(PORT_FOR_MOCKSERVER);
+        super(PORT_FOR_MOCKSERVER);
     }
 
     public URL getRootUrlHostAndPort() throws MalformedURLException {
-       return new URL("http://127.0.0.1:" + PORT_FOR_MOCKSERVER);
+        return new URL("http://127.0.0.1:" + PORT_FOR_MOCKSERVER);
     }
 
     public void createMockForAutoIndex(String urlPath, int filesLevel1, int dirsLevel1, int filesLevel2) {
@@ -40,36 +35,39 @@ public class MockServerServingTree extends ClientAndServer {
         List<AutoIndexItem> listLevel1 = new ArrayList<>();
         List<String> dirs = new ArrayList<>();
         for (int i = 1; i <= filesLevel1; i++) {
-            listLevel1.add(new AutoIndexItem("file" + i + ".txt", AutoIndexItemType.file));
+            AutoIndexItem a = new AutoIndexItem("file" + i + ".txt", AutoIndexItemType.file);
+            listLevel1.add(a);
+            createMockEndpoint(urlPath + a.getName(), a.getName(), "text/plain");
         }
         for (int i = 1; i <= dirsLevel1; i++) {
             AutoIndexItem a = new AutoIndexItem("folder" + i, AutoIndexItemType.directory);
             listLevel1.add(a);
             dirs.add(a.getName());
         }
-        createMockEndpoint(urlPath, listLevel1);
+        createDirectoryMockEndpoint(urlPath, listLevel1);
 
         for (String d : dirs) {
             List<AutoIndexItem> listLevel2 = new ArrayList<>();
             for (int i = 1; i <= filesLevel2; i++) {
-                listLevel2.add(new AutoIndexItem(d + "-file" + i + ".txt", AutoIndexItemType.file));
+                AutoIndexItem a = new AutoIndexItem(d + "-file" + i + ".txt", AutoIndexItemType.file);
+                listLevel2.add(a);
+                createMockEndpoint(urlPath + d + "/" + a.getName(), a.getName(), "text/plain");
             }
-            createMockEndpoint(urlPath + d + "/", listLevel2);
+            createDirectoryMockEndpoint(urlPath + d + "/", listLevel2);
         }
     }
 
-    private void createMockEndpoint(String urlPath, List<AutoIndexItem> lst) {
+    private void createDirectoryMockEndpoint(String urlPath, List<AutoIndexItem> lst) {
         String jsonBody;
         try {
             jsonBody = objectMapper.writeValueAsString(lst);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        createMockEndpoint(urlPath, jsonBody);
+        createMockEndpoint(urlPath, jsonBody, "application/json; charset=utf-8");
     }
 
-    @SuppressWarnings("try")
-    private void createMockEndpoint(String urlPath, String jsonBody) {
+    private void createMockEndpoint(String urlPath, String body, String contentType) {
 
         new MockServerClient("127.0.0.1", PORT_FOR_MOCKSERVER)
             .when(
@@ -81,9 +79,9 @@ public class MockServerServingTree extends ClientAndServer {
                 response()
                     .withStatusCode(200)
                     .withHeaders(
-                        new Header("Content-Type", "application/json; charset=utf-8")
+                        new Header("Content-Type", contentType)
                     )
-                    .withBody(jsonBody)
+                    .withBody(body)
                     .withDelay(TimeUnit.MILLISECONDS, 50)
             );
     }
