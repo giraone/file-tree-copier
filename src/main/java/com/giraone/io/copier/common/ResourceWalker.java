@@ -21,13 +21,26 @@ public class ResourceWalker {
 
     private static final ConcurrentMap<String, Object> locks = new ConcurrentHashMap<>();
 
-    public void walk(String resource, int maxDepth, Consumer<File> consumer) throws Exception {
+    /**
+     * Walk through a given resource tree. The walk always starts with the resource itself!
+     * So directory with 2 entries, will have 3 nodes!
+     * @param resource the resource to start.
+     * @param maxDepth walking depth, must be greater or equal 1
+     * @param consumer the consumer process to consume the tree nodes
+     */
+    public void walk(String resource, int maxDepth, Consumer<File> consumer) {
+        try {
+            innerWalk(resource, maxDepth, consumer);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    private void innerWalk(String resource, int maxDepth, Consumer<File> consumer) throws Exception {
 
         final URL url = ResourceUtils.getURL(resource);
-        if (url == null) {
-            throw new FileNotFoundException("resource \""
-                + resource + "\" cannot be resolved to URL because it does not exist!");
-        }
         final URI uri = url.toURI();
         if (URL_PROTOCOL_JAR.equals(uri.getScheme())) {
             safeWalkJar(resource, uri, maxDepth, consumer);
@@ -36,7 +49,7 @@ public class ResourceWalker {
             if (file.exists()) {
                 final Path path = file.toPath();
                 Files.walk(path, maxDepth)
-                    .map(p -> p.toFile())
+                    .map(Path::toFile)
                     .forEach(consumer);
             } else {
                 throw new FileNotFoundException("File for resource \"" + resource + "\", uri=\""+ uri + "\" does not exist!");
@@ -49,7 +62,7 @@ public class ResourceWalker {
         synchronized (getLock(uri)) {
             try (FileSystem fs = getFileSystem(uri)) {
                 Files.walk(fs.getPath(resource), maxDepth)
-                    .map(p -> p.toFile())
+                    .map(Path::toFile)
                     .forEach(consumer);
             }
         }

@@ -4,7 +4,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +19,14 @@ class ResourceWalkerTest {
         "classpath:test-data/tree1/dir1,10,7",
         "classpath:test-data/tree1/dir1/dir11,10,2",
     })
-    void walk(String resource, int maxDepth, int expectedSize) throws Exception {
+    void walk(String resource, int maxDepth, int expectedSize) {
 
         List<File> result = new ArrayList<>();
         ResourceWalker resourceWalker = new ResourceWalker();
         resourceWalker.walk(
             resource,
             maxDepth,
-            path -> result.add(path));
+            result::add);
 
         assertThat(result).hasSize(expectedSize);
     }
