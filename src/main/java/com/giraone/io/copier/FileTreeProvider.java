@@ -22,5 +22,25 @@ public interface FileTreeProvider<T extends SourceFile> {
      */
     FileTree<T> provideTree();
 
+    /**
+     * Derive the relative path of the file created within the target directory, when the
+     * source node is given. A typical example for HTTP would be
+     * <pre>
+     *     ROOT URL     = http://localhost:8080/subdir1
+     *     fileTreeNode = http://localhost:8080/subdir1/subdir11/file.txt
+     *     RESULT       = subdir11/file.txt
+     * </pre>
+     * @param fileTreeNode the source node
+     * @return the relative path
+     */
     String calculateRelativeTargetFilePath(T fileTreeNode);
+
+    /**
+     * Return the implementation used to read from a URL. For file tree provided by a web server,
+     * this is typically an HTTP client implementation. For reading trees from other sources,
+     * e.g. file trees or class path trees, the default implementation
+     * {@link com.giraone.io.copier.resource.DirectReadFromUrlStreamProvider} can be used.
+     * @return the providing implementation
+     */
+    ReadFromUrlStreamProvider getReadFromUrlInputStreamProvider();
 }

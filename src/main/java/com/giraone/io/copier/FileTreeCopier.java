@@ -59,7 +59,8 @@ public class FileTreeCopier<T extends SourceFile> {
         } else {
             final URL url = node.getData().getUrl();
             try {
-                final long bytesCopied = FileCopy.copyUrlContentToFile(url, targetFile);
+                final long bytesCopied = FileCopy.copyUrlContentToFile(url,
+                    fileTreeProvider.getReadFromUrlInputStreamProvider(), targetFile);
                 copierResult.fileCopied(bytesCopied);
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -2,6 +2,7 @@ package com.giraone.io.copier.resource;
 
 import com.giraone.io.copier.AbstractFileTreeProvider;
 import com.giraone.io.copier.FileTreeProvider;
+import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.common.ResourceWalker;
 import com.giraone.io.copier.model.FileTree;
@@ -13,6 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPathResourceFile> {
+
+    private static final ReadFromUrlStreamProvider readFromUrlStreamProvider = new DirectReadFromUrlStreamProvider();
 
     private final String rootResourcePath;
     private Function<SourceFile, Boolean> sourceFileFilterFunction;
@@ -41,6 +44,11 @@ public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPat
 
         final String path = fileTreeNode.getResourcePath();
         return extractNeededChildPath(rootResourcePath, path);
+    }
+
+    @Override
+    public ReadFromUrlStreamProvider getReadFromUrlInputStreamProvider() {
+        return readFromUrlStreamProvider;
     }
 
     //------------------------------------------------------------------------------------------------------------------

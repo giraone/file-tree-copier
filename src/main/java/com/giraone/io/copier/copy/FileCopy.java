@@ -1,6 +1,7 @@
 package com.giraone.io.copier.copy;
 
 import com.giraone.io.copier.common.IoStreamUtils;
+import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +20,11 @@ public class FileCopy {
     private FileCopy() {
     }
 
-    public static long copyUrlContentToFile(URL url, File file) throws IOException {
+    public static long copyUrlContentToFile(URL url, ReadFromUrlStreamProvider readFromUrlStreamProvider, File file) throws IOException {
 
         LOGGER.info("OPEN URL \"{}\"", url);
         try (OutputStream out = new FileOutputStream(file)) {
-            try (InputStream in = url.openStream()) {
+            try (InputStream in = readFromUrlStreamProvider.openInputStream(url)) {
                 long bytesCopied = IoStreamUtils.pipeBlobStream(in, out);
                 LOGGER.debug("Copied URL \"{}\" with {} bytes to file \"{}\"", url, bytesCopied, file);
                 return bytesCopied;

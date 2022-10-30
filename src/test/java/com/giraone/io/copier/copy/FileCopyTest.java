@@ -3,6 +3,7 @@ package com.giraone.io.copier.copy;
 import com.giraone.io.copier.common.IoStreamUtils;
 import com.giraone.io.copier.common.PathUtils;
 import com.giraone.io.copier.common.ResourceUtils;
+import com.giraone.io.copier.resource.DirectReadFromUrlStreamProvider;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -33,7 +34,7 @@ class FileCopyTest {
         targetFile.deleteOnExit();
 
         // act
-        long bytesCopied = FileCopy.copyUrlContentToFile(url, targetFile);
+        long bytesCopied = FileCopy.copyUrlContentToFile(url, new DirectReadFromUrlStreamProvider(), targetFile);
 
         // assert
         assertThat(bytesCopied).isEqualTo(expected);

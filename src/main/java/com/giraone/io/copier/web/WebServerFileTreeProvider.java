@@ -4,6 +4,8 @@ import com.giraone.io.copier.AbstractFileTreeProvider;
 import com.giraone.io.copier.FileTreeProvider;
 import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.model.FileTree;
+import com.giraone.io.copier.web.http.DefaultHttpClientInputStreamProvider;
+import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import com.giraone.io.copier.web.index.AutoIndexItem;
 import com.giraone.io.copier.web.index.AutoIndexItemType;
 import com.giraone.io.copier.web.index.AutoIndexReader;
@@ -30,9 +32,15 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
 
     private final URL rootUrl;
     private Function<SourceFile, Boolean> sourceFileFilterFunction = null;
+    private ReadFromUrlStreamProvider httpClient = new DefaultHttpClientInputStreamProvider();
 
     public WebServerFileTreeProvider(URL rootUrl) {
         this.rootUrl = rootUrl;
+    }
+
+    public WebServerFileTreeProvider withHttpClient(ReadFromUrlStreamProvider httpClient) {
+        this.httpClient = httpClient;
+        return this;
     }
 
     @Override
@@ -57,11 +65,16 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
         return extractNeededChildPath(rootUrl.getPath(), path);
     }
 
+    @Override
+    public ReadFromUrlStreamProvider getReadFromUrlInputStreamProvider() {
+        return httpClient;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
 
     protected void provideTreeFromAutoIndex(URL url, FileTree.FileTreeNode<WebServerFile> fileTreeNode) {
 
-        final List<AutoIndexItem> children = read(url);
+        final List<AutoIndexItem> children = readIndexedContentList(url);
         children.forEach(child -> {
             final URL childUrl = childUrl(url, child.getName(), child.isDirectory());
             final WebServerFile childFile = new WebServerFile(childUrl, child.getName(), child.isDirectory());
@@ -75,14 +88,9 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
         });
     }
 
-    private List<AutoIndexItem> read(URL url) {
+    private List<AutoIndexItem> readIndexedContentList(URL url) {
 
-        InputStream in;
-        try {
-            in = url.openStream();
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot open URL \"" + url + "\"", e);
-        }
+        InputStream in = httpClient.openInputStream(url);
         try {
             return autoIndexReader.read(in);
         } catch (IOException e) {

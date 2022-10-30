@@ -1,8 +1,10 @@
 package com.giraone.io.copier.web;
 
 import com.giraone.io.copier.AbstractSourceFile;
+import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.model.FileTree;
+import com.giraone.io.copier.resource.DirectReadFromUrlStreamProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -150,5 +153,33 @@ class WebServerFileTreeProviderTest {
         // assert
         List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.traverse().collect(Collectors.toList());
         assertThat(rootList).hasSize(expectedCount);
+    }
+
+    @Test
+    void overwrittenIsCalled() throws MalformedURLException {
+
+        // arrange
+        URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
+        String rootPath = "/provideTreeFromAutoIndexWithoutFilter/";
+        URL rootUrl = new URL(rootUrlHostAndPort + rootPath);
+        mockServerServingTree.createMockForAutoIndex(rootPath, 1, 1, 1);
+        WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
+
+        AtomicInteger calls = new AtomicInteger(0);
+        ReadFromUrlStreamProvider overwrittenProvider = url -> {
+            calls.getAndIncrement();
+            DirectReadFromUrlStreamProvider p = new DirectReadFromUrlStreamProvider();
+            return p.openInputStream(url);
+        };
+        fileTreeProvider.withHttpClient(overwrittenProvider);
+
+        WebServerFile file = new WebServerFile(rootUrl);
+        final FileTree.FileTreeNode<WebServerFile> fileTreeNode = new FileTree.FileTreeNode<>(file, null);
+        // act
+        fileTreeProvider.provideTreeFromAutoIndex(rootUrl, fileTreeNode);
+        // assert
+        assertThat(fileTreeNode.getData()).isNotNull();
+        // Must be called twice: once for the root (index), once for the only file
+        assertThat(calls.get()).isEqualTo(2);
     }
 }
