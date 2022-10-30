@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.stream.Stream;
 
+/**
+ * Utility class for copying a file tree from web server or from classpath resource to a (local) file system.
+ * @param <T> the file tree node implementation
+ */
 public class FileTreeCopier<T extends SourceFile> {
 
     private FileTreeProvider<T> fileTreeProvider;
@@ -16,12 +20,31 @@ public class FileTreeCopier<T extends SourceFile> {
     public FileTreeCopier() {
     }
 
+    /**
+     * Define the file tree provider to read the tree and content
+     * @param fileTreeProvider FileTreeProvider implementation
+     * @return this
+     */
     public FileTreeCopier withFileTreeProvider(FileTreeProvider<T> fileTreeProvider) {
         this.fileTreeProvider = fileTreeProvider;
         return this;
     }
 
+    /**
+     * Define the target directory to copy to.
+     * @param targetDirectory the target directory, that must exists
+     * @return this
+     */
     public FileTreeCopier withTargetDirectory(File targetDirectory) {
+        if (targetDirectory == null) {
+            throw new IllegalArgumentException("Target directory cannot be null!");
+        }
+        if (!targetDirectory.exists()) {
+            throw new IllegalArgumentException("Target directory \"" + targetDirectory + "\" must exist!");
+        }
+        if (!targetDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Target directory \"" + targetDirectory + "\" must be a directory!");
+        }
         this.targetDirectory = targetDirectory;
         return this;
     }

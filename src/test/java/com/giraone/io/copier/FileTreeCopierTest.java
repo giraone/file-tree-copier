@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FileTreeCopierTest {
@@ -40,6 +41,33 @@ class FileTreeCopierTest {
     }
 
     @Test
+    void withTargetDirectoryNull() {
+        assertThatThrownBy(() -> new FileTreeCopier<>().withTargetDirectory(null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("cannot be null");
+    }
+
+    @Test
+    void withTargetDirectoryIsFile() throws IOException {
+
+        File targetDirectory = File.createTempFile("withTargetDirectoryFile", "");
+        targetDirectory.deleteOnExit();
+        assertThatThrownBy(() -> new FileTreeCopier<>().withTargetDirectory(targetDirectory))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("must be a directory");
+    }
+
+    @Test
+    void withTargetDirectoryNotExists() throws IOException {
+
+        File targetDirectory = File.createTempFile("withTargetDirectoryNotExists", "");
+        assertThat(targetDirectory.delete()).isTrue();
+        assertThatThrownBy(() -> new FileTreeCopier<>().withTargetDirectory(targetDirectory))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("must exist");
+    }
+
+    @Test
     void copyUsingWebServerFileTreeProvider() throws IOException {
 
         // arrange
@@ -51,7 +79,7 @@ class FileTreeCopierTest {
 
         FileTreeCopier<WebServerFile> fileTreeCopier = new FileTreeCopier<>();
         fileTreeCopier.withFileTreeProvider(source);
-        File tmpDir = geTmpDirectory();
+        File tmpDir = getTmpDirectory();
         fileTreeCopier.withTargetDirectory(tmpDir);
 
         // act
@@ -92,7 +120,7 @@ class FileTreeCopierTest {
         String resourcePath = "classpath:test-data/tree1";
         ClassPathFileTreeProvider source = new ClassPathFileTreeProvider(resourcePath);
         fileTreeCopier.withFileTreeProvider(source);
-        File tmpDir = geTmpDirectory();
+        File tmpDir = getTmpDirectory();
         fileTreeCopier.withTargetDirectory(tmpDir);
 
         // act
@@ -130,7 +158,7 @@ class FileTreeCopierTest {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    private File geTmpDirectory() throws IOException {
+    private File getTmpDirectory() throws IOException {
         File tmpDir = File.createTempFile("file-tree-", "");
         assertThat(tmpDir.delete()).isTrue();
         assertThat(tmpDir.mkdir()).isTrue();
