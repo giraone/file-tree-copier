@@ -141,11 +141,11 @@ class WebServerFileTreeProviderTest {
         mockServerServingTree.createMockForAutoIndex(rootPath, filesLevel1, 0, 0);
         WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
         Function<SourceFile, Boolean> fct = sourceFile -> {
-            boolean ret = sourceFile.isDirectory() || sourceFile.getName().contains(fileContains);
+            boolean ret = sourceFile.getName().contains(fileContains);
             LOGGER.debug("Applied sourceFileFileFunction for {} returns {}", sourceFile, ret);
             return ret;
         };
-        fileTreeProvider.withFilter(fct);
+        fileTreeProvider.withFileFilter(fct);
         WebServerFile file = new WebServerFile(rootUrl);
         final FileTree.FileTreeNode<WebServerFile> fileTreeNode = new FileTree.FileTreeNode<>(file, null);
         // act

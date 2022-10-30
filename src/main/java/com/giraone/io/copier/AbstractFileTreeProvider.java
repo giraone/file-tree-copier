@@ -1,6 +1,23 @@
 package com.giraone.io.copier;
 
+import java.util.function.Function;
+
 public abstract class AbstractFileTreeProvider<T extends SourceFile> implements FileTreeProvider<T> {
+
+    protected Function<SourceFile, Boolean> sourceDirectoryFilterFunction = null;
+    protected Function<SourceFile, Boolean> sourceFileFilterFunction = null;
+
+    @Override
+    public FileTreeProvider<T> withDirectoryFilter(Function<SourceFile, Boolean> sourceDirectoryFilterFunction) {
+        this.sourceDirectoryFilterFunction = sourceDirectoryFilterFunction;
+        return this;
+    }
+
+    @Override
+    public FileTreeProvider<T> withFileFilter(Function<SourceFile, Boolean> sourceFileFilterFunction) {
+        this.sourceFileFilterFunction = sourceFileFilterFunction;
+        return this;
+    }
 
     protected static String extractNeededParentPath(String parentSourcePath, String resourceRoot) {
 

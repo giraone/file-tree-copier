@@ -2,10 +2,9 @@ package com.giraone.io.copier.web;
 
 import com.giraone.io.copier.AbstractFileTreeProvider;
 import com.giraone.io.copier.FileTreeProvider;
-import com.giraone.io.copier.SourceFile;
+import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import com.giraone.io.copier.model.FileTree;
 import com.giraone.io.copier.web.http.DefaultHttpClientInputStreamProvider;
-import com.giraone.io.copier.ReadFromUrlStreamProvider;
 import com.giraone.io.copier.web.index.AutoIndexItem;
 import com.giraone.io.copier.web.index.AutoIndexItemType;
 import com.giraone.io.copier.web.index.AutoIndexReader;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * A {@link FileTreeProvider} provided by a web server using JSON index files.
@@ -31,7 +29,6 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
     private static final AutoIndexReader autoIndexReader = new AutoIndexReader();
 
     private final URL rootUrl;
-    private Function<SourceFile, Boolean> sourceFileFilterFunction = null;
     private ReadFromUrlStreamProvider httpClient = new DefaultHttpClientInputStreamProvider();
 
     public WebServerFileTreeProvider(URL rootUrl) {
@@ -40,12 +37,6 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
 
     public WebServerFileTreeProvider withHttpClient(ReadFromUrlStreamProvider httpClient) {
         this.httpClient = httpClient;
-        return this;
-    }
-
-    @Override
-    public FileTreeProvider<WebServerFile> withFilter(Function<SourceFile, Boolean> sourceFileFilterFunction) {
-        this.sourceFileFilterFunction = sourceFileFilterFunction;
         return this;
     }
 

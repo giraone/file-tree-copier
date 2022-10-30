@@ -7,13 +7,20 @@ import java.util.function.Function;
 public interface FileTreeProvider<T extends SourceFile> {
 
     /**
-     * Configure the file tree provider to return only files matching filter (e.g. name matches a certain file extension)
-     * and to traverse only directories matching the filter.
+     * Configure the file tree provider to traverse and return only directories matching a filter.
+     *
+     * @param sourceDirectoryFilterFunction a filter function on the source file
+     * @return the called object
+     */
+    FileTreeProvider<T> withDirectoryFilter(Function<SourceFile, Boolean> sourceDirectoryFilterFunction);
+
+    /**
+     * Configure the file tree provider to return only files matching a filter, e.g. name matches a certain file extension.
      *
      * @param sourceFileFilterFunction a filter function on the source file
      * @return the called object
      */
-    FileTreeProvider<T> withFilter(Function<SourceFile, Boolean> sourceFileFilterFunction);
+    FileTreeProvider<T> withFileFilter(Function<SourceFile, Boolean> sourceFileFilterFunction);
 
     /**
      * Traverse the defined source and return a node tree

@@ -1,9 +1,7 @@
 package com.giraone.io.copier.resource;
 
 import com.giraone.io.copier.AbstractFileTreeProvider;
-import com.giraone.io.copier.FileTreeProvider;
 import com.giraone.io.copier.ReadFromUrlStreamProvider;
-import com.giraone.io.copier.SourceFile;
 import com.giraone.io.copier.common.ResourceWalker;
 import com.giraone.io.copier.model.FileTree;
 
@@ -11,23 +9,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPathResourceFile> {
 
     private static final ReadFromUrlStreamProvider readFromUrlStreamProvider = new DirectReadFromUrlStreamProvider();
 
+    // always without trailing /
     private final String rootResourcePath;
-    private Function<SourceFile, Boolean> sourceFileFilterFunction;
 
     public ClassPathFileTreeProvider(String rootResourcePath) {
+        while (rootResourcePath.endsWith("/")) {
+            rootResourcePath = rootResourcePath.substring(0, rootResourcePath.length() - 1);
+        }
         this.rootResourcePath = rootResourcePath;
-    }
-
-    @Override
-    public FileTreeProvider<ClassPathResourceFile> withFilter(Function<SourceFile, Boolean> sourceFileFilterFunction) {
-        this.sourceFileFilterFunction = sourceFileFilterFunction;
-        return this;
     }
 
     @Override

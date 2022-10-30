@@ -8,7 +8,19 @@
 
 Utility JAR for copying a file tree from web server or from classpath resource to a (local) file system.
 
+## Features
+
+- The source can be
+  - a web server serving files and directory listings with JSON based indexes, e.g. `nginx` with `auto-index: on`.
+  - a file tree within a resource folder of the running Java process, e.g. from a JAR
+  - a file tree within the file system
+- When using an HTTP source, the used HTTP client can be configured. The default implementation is the native HTTP client
+  of Java 11.
+- The source can be filtered, e.g. using a check for file name extensions.
+
 ## Usage
+
+### Copy from a web server
 
 ```java
 public class HowToCopy
@@ -17,18 +29,40 @@ public class HowToCopy
         
         URL url = new URL("https://my-nginx-server/public/");
         WebServerFileTreeProvider source = new WebServerFileTreeProvider(url);
-        // Optional filter for traversal on source files, e.g. name filter for file extensions
-        source.withFilter(sourceFile -> sourceFile.isDirectory() || sourceFile.getName().endsWith(".css"));
+        // Here: optional filter hidden directories
+        source.withDirectoryFilter(sourceDirectory -> !sourceDirectory.getName().startsWith("."));
+        // Here: optional filter CSS files
+        source.withFileFilter(sourceFile -> sourceFile.getName().endsWith(".css"));
         
         FileTreeCopier<WebServerFile> fileTreeCopier = new FileTreeCopier<>();
         fileTreeCopier.withFileTreeProvider(source);
         File target = new File("/tmp/download");
         fileTreeCopier.withTargetDirectory(target);
 
-        int copied = fileTreeCopier.copy();
+        int numberOfFilesCopied = fileTreeCopier.copy().getFilesCopied();
     }
 }
 ```
+
+### Copy from a resource folder
+
+```java
+public class HowToCopy
+{
+    public void copy() {
+        
+        ClassPathFileTreeProvider source = new ClassPathFileTreeProvider("classpath:fonts/");
+        // Here: optional filter for True Type Font files
+        source.withFileFilter(sourceFile -> sourceFile.getName().endsWith(".ttf"));
+        FileTreeCopier<ClassPathResourceFile> fileTreeCopier = new FileTreeCopier<>();
+        fileTreeCopier.withFileTreeProvider(source);
+        fileTreeCopier.withTargetDirectory(fontsDirectory);
+
+        int numberOfFilesCopied = fileTreeCopier.copy().getFilesCopied();
+    }
+}
+```
+
 ## Build
 
 ## Release Notes
