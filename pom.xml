@@ -3,7 +3,7 @@
   
   <groupId>com.giraone.io</groupId>
   <artifactId>file-tree-copier</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <packaging>jar</packaging>
 
@@ -37,7 +37,7 @@
     <connection>scm:git:git://github.com/giraone/file-tree-copier.git</connection>
     <developerConnection>scm:git:git@github.com:giraone/giraone.git</developerConnection>
     <url>https://github.com/giraone/file-tree-copier.git</url>
-    <tag>HEAD</tag>
+    <tag>file-tree-copier-1.0.0</tag>
   </scm>
 
   <distributionManagement>
