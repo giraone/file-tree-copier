@@ -18,6 +18,8 @@ class ResourceWalkerTest {
         "classpath:test-data/tree1/dir1/dir11,1,2",
         "classpath:test-data/tree1/dir1,10,7",
         "classpath:test-data/tree1/dir1/dir11,10,2",
+        // TODO: test for JAR URLs
+        // "jar:file:/C:GIT/giraone/file-tree-copier/logback-classic-1.4.4.jar!/META-INF,1,1"
     })
     void walk(String resource, int maxDepth, int expectedSize) {
 

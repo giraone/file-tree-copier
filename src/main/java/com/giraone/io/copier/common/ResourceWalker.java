@@ -44,6 +44,9 @@ public class ResourceWalker {
         final URL url = ResourceUtils.getURL(resource);
         final URI uri = url.toURI();
         if (URL_PROTOCOL_JAR.equals(uri.getScheme())) {
+            // final JarURLConnection connection = (JarURLConnection) url.openConnection();
+            // final URL url2 = connection.getJarFileURL();
+            // final URI uri2 = url2.toURI();
             safeWalkJar(resource, uri, maxDepth, consumer);
         } else {
             File file = new File(uri);
@@ -78,7 +81,11 @@ public class ResourceWalker {
 
     private String parseFileName(URI uri) {
 
-        String schemeSpecificPart = uri.getSchemeSpecificPart();
-        return schemeSpecificPart.substring(0, schemeSpecificPart.indexOf("!"));
+        final String schemeSpecificPart = uri.getSchemeSpecificPart();
+        final int i = schemeSpecificPart.indexOf("!");
+        if (i == -1) {
+            throw new IllegalArgumentException("URI \"" + uri + "\" is not a JAR URI!");
+        }
+        return schemeSpecificPart.substring(0, i);
     }
 }
