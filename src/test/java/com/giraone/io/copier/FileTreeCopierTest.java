@@ -156,6 +156,44 @@ class FileTreeCopierTest {
         deleteDirectory(tmpDir);
     }
 
+    @Test
+    void copyUsingClassPathFileTreeProviderFlat() throws IOException {
+        // arrange
+        FileTreeCopier<ClassPathResourceFile> fileTreeCopier = new FileTreeCopier<>();
+        String resourcePath = "classpath:test-data/tree1";
+        ClassPathFileTreeProvider source = new ClassPathFileTreeProvider(resourcePath);
+        fileTreeCopier.withFileTreeProvider(source);
+        File tmpDir = getTmpDirectory();
+        fileTreeCopier.withTargetDirectory(tmpDir);
+        fileTreeCopier.withFlatCopy();
+
+        // act
+        long start = System.currentTimeMillis();
+        CopierResult copierResult = fileTreeCopier.copy();
+        long end = System.currentTimeMillis();
+        LOGGER.info("Copying of {} directories, {} files, {} bytes took {} msecs",
+            copierResult.getDirectoriesCreated(), copierResult.getFilesCopied(),
+            copierResult.getBytesCopied(), end - start);
+
+        /*
+        - file1.txt
+        - file2.txt
+        - file11.txt
+        - file12.txt
+        - file111.txt
+        - file121.txt
+        */
+
+        // assert
+        assertThat(new File(tmpDir, "file11.txt").exists()).isTrue();
+        assertThat(copierResult.getDirectoriesCreated()).isEqualTo(0);
+        assertThat(copierResult.getFilesCopied()).isEqualTo(6);
+        assertThat(copierResult.getBytesCopied()).isEqualTo(42L);
+
+        // clean up
+        deleteDirectory(tmpDir);
+    }
+
     //------------------------------------------------------------------------------------------------------------------
 
     private File getTmpDirectory() throws IOException {

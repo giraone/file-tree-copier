@@ -28,7 +28,7 @@ public class FileTree<T extends SourceFile> {
         return ret;
     }
 
-    public static class FileTreeNode<T> {
+    public static class FileTreeNode<T extends SourceFile> {
         private final T data;
         private final FileTreeNode<T> parent;
         private List<FileTreeNode<T>> children;
@@ -71,10 +71,10 @@ public class FileTree<T extends SourceFile> {
          */
         public void getRecursiveFileList(List<FileTreeNode<T>> lst) {
             if (children == null) {
-                throw new IllegalStateException("Node has " + data + " has no children!");
+                return;
             }
             children.forEach(c -> {
-                if (c.hasChildren()) {
+                if (c.data.isDirectory()) {
                     c.getRecursiveFileList(lst);
                 } else {
                     lst.add(c);

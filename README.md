@@ -18,6 +18,7 @@ Utility JAR for copying a file tree from web server or from classpath resource t
   of Java 11.
 - The source can be filtered on files, e.g. using a check for file name extensions.
 - The source can be filtered on directories/folder, that should not be traversed, e.g. hidden directories, starting with a dot (.). 
+- There is a flat copy mode, where the source files are copied directly to the target directory without re-building the source directory tree.
 
 ## Usage
 

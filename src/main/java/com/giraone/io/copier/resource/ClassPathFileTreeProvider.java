@@ -68,10 +68,14 @@ public class ClassPathFileTreeProvider extends AbstractFileTreeProvider<ClassPat
             final ClassPathResourceFile childClassPathResourceFile = new ClassPathResourceFile(childPath, fileName, isDirectory);
             final FileTree.FileTreeNode<ClassPathResourceFile> childFileTreeNode = new FileTree.FileTreeNode<>(
                 childClassPathResourceFile, fileTreeNode);
-            if (sourceFileFilterFunction == null || sourceFileFilterFunction.apply(childClassPathResourceFile)) {
-                fileTreeNode.addChild(childFileTreeNode);
-                if (isDirectory) {
+            if (isDirectory) {
+                if (sourceTraverseFilterFunction == null || sourceTraverseFilterFunction.apply(childClassPathResourceFile)) {
+                    fileTreeNode.addChild(childFileTreeNode);
                     provideTreeFromResourceLookup(childPath, childFileTreeNode);
+                }
+            } else {
+                if (sourceFileFilterFunction == null || sourceFileFilterFunction.apply(childClassPathResourceFile)) {
+                    fileTreeNode.addChild(childFileTreeNode);
                 }
             }
         }
