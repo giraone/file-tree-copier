@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.giraone.io</groupId>
   <artifactId>file-tree-copier</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
@@ -87,10 +86,10 @@
     <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
     <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
     <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
-    <maven-release-plugin.version>3.0.0-M6</maven-release-plugin.version>
+    <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-    <maven-scm-provider-gitexe.version>2.0.0-M2</maven-scm-provider-gitexe.version>
-    <maven-scm-api.version>2.0.0-M2</maven-scm-api.version>
+    <maven-scm-provider-gitexe.version>1.13.0</maven-scm-provider-gitexe.version>
+    <maven-scm-api.version>1.13.0</maven-scm-api.version>
     <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
     <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
@@ -266,8 +265,7 @@
           </dependency>
         </dependencies>
       </plugin>
-      <!-- Keep versions up-to-date using
-        mvn versions:update-parent && mvn versions:update-properties && mvn versions:use-latest-versions -->
+      <!-- Keep versions up-to-date using mvn versions:update-properties && mvn versions:use-latest-versions -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
