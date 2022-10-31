@@ -84,15 +84,15 @@ class WebServerFileTreeProviderTest {
         mockServerServingTree.createMockForAutoIndex(rootPath, filesLevel1, dirsLevel1, filesLevel2);
         WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
         // act
-        FileTree<WebServerFile> relativeTargetFilePath = fileTreeProvider.provideTree();
+        FileTree<WebServerFile> tree = fileTreeProvider.provideTree();
         // assert
-        assertThat(relativeTargetFilePath).isNotNull();
-        List<FileTree.FileTreeNode<WebServerFile>> list1 = relativeTargetFilePath.traverse().collect(Collectors.toList());
+        assertThat(tree).isNotNull();
+        List<FileTree.FileTreeNode<WebServerFile>> list1 = tree.getChildren().collect(Collectors.toList());
         assertThat(list1).hasSize(expectedChildrenLevel1);
         int count = 0;
         for (FileTree.FileTreeNode<WebServerFile> item2 : list1) {
             if (item2.hasChildren()) {
-                List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.traverse().collect(Collectors.toList());
+                List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.getChildren().collect(Collectors.toList());
                 count += list2.size();
             }
         }
@@ -117,7 +117,7 @@ class WebServerFileTreeProviderTest {
         assertThat(fileTreeNode.getData()).isNotNull();
         assertThat(fileTreeNode.getData().getUrl()).isEqualTo(rootUrl);
         assertThat(fileTreeNode.getData().getName()).isNull();
-        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.traverse().collect(Collectors.toList());
+        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.getChildren().collect(Collectors.toList());
         assertThat(rootList).hasSize(1);
         FileTree.FileTreeNode<WebServerFile> dir1 = rootList.get(0);
         assertThat(dir1.getParent()).isNotNull();
@@ -129,10 +129,38 @@ class WebServerFileTreeProviderTest {
 
     @ParameterizedTest
     @CsvSource({
+        "folder1,2",
+        "folder,4",
+    })
+    void provideTreeFromAutoIndexWithTraverseFilter(String directoryContains, int expectedFilesLevel2)
+        throws MalformedURLException {
+
+        // arrange
+        URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
+        String rootPath = "/provideTreeFromAutoIndexWithFilter/" + directoryContains + "/";
+        URL rootUrl = new URL(rootUrlHostAndPort + rootPath);
+        mockServerServingTree.createMockForAutoIndex(rootPath, 0, 2, 2);
+        WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
+        Function<SourceFile, Boolean> traverseFilterFct = sourceFile -> {
+            boolean ret = sourceFile.getName().contains(directoryContains);
+            LOGGER.debug("Applied traverseFilter for {} returns {}", sourceFile, ret);
+            return ret;
+        };
+        fileTreeProvider.withTraverseFilter(traverseFilterFct);
+        // act
+        FileTree<WebServerFile> tree = fileTreeProvider.provideTree();
+        // assert
+        List<FileTree.FileTreeNode<WebServerFile>> traverseList = tree.getRecursiveFileList();
+        assertThat(traverseList).hasSize(expectedFilesLevel2);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
         "4,file1,1",
         "10,file1,2",
     })
-    void provideTreeFromAutoIndexWithFilter(int filesLevel1, String fileContains, int expectedCount) throws MalformedURLException {
+    void provideTreeFromAutoIndexWithFileFilter(int filesLevel1, String fileContains, int expectedFilesLevel1)
+        throws MalformedURLException {
 
         // arrange
         URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
@@ -140,19 +168,17 @@ class WebServerFileTreeProviderTest {
         URL rootUrl = new URL(rootUrlHostAndPort + rootPath);
         mockServerServingTree.createMockForAutoIndex(rootPath, filesLevel1, 0, 0);
         WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
-        Function<SourceFile, Boolean> fct = sourceFile -> {
+        Function<SourceFile, Boolean> fileFilterFct = sourceFile -> {
             boolean ret = sourceFile.getName().contains(fileContains);
-            LOGGER.debug("Applied sourceFileFileFunction for {} returns {}", sourceFile, ret);
+            LOGGER.debug("Applied fileFilter for {} returns {}", sourceFile, ret);
             return ret;
         };
-        fileTreeProvider.withFileFilter(fct);
-        WebServerFile file = new WebServerFile(rootUrl);
-        final FileTree.FileTreeNode<WebServerFile> fileTreeNode = new FileTree.FileTreeNode<>(file, null);
+        fileTreeProvider.withFileFilter(fileFilterFct);
         // act
-        fileTreeProvider.provideTreeFromAutoIndex(rootUrl, fileTreeNode);
+        FileTree<WebServerFile> tree = fileTreeProvider.provideTree();
         // assert
-        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.traverse().collect(Collectors.toList());
-        assertThat(rootList).hasSize(expectedCount);
+        List<FileTree.FileTreeNode<WebServerFile>> traverseList = tree.getRecursiveFileList();
+        assertThat(traverseList).hasSize(expectedFilesLevel1);
     }
 
     @Test

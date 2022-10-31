@@ -43,7 +43,7 @@ class ClassPathFileTreeProviderTest {
         FileTree<ClassPathResourceFile> relativeTargetFilePath = fileTreeProvider.provideTree();
         // assert
         assertThat(relativeTargetFilePath).isNotNull();
-        List<FileTree.FileTreeNode<ClassPathResourceFile>> list = relativeTargetFilePath.traverse().collect(Collectors.toList());
+        List<FileTree.FileTreeNode<ClassPathResourceFile>> list = relativeTargetFilePath.getChildren().collect(Collectors.toList());
         assertThat(list).hasSize(expectedChildrenLevel1);
     }
 }

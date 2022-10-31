@@ -4,12 +4,12 @@ import java.util.function.Function;
 
 public abstract class AbstractFileTreeProvider<T extends SourceFile> implements FileTreeProvider<T> {
 
-    protected Function<SourceFile, Boolean> sourceDirectoryFilterFunction = null;
+    protected Function<SourceFile, Boolean> sourceTraverseFilterFunction = null;
     protected Function<SourceFile, Boolean> sourceFileFilterFunction = null;
 
     @Override
-    public FileTreeProvider<T> withDirectoryFilter(Function<SourceFile, Boolean> sourceDirectoryFilterFunction) {
-        this.sourceDirectoryFilterFunction = sourceDirectoryFilterFunction;
+    public FileTreeProvider<T> withTraverseFilter(Function<SourceFile, Boolean> sourceDirectoryFilterFunction) {
+        this.sourceTraverseFilterFunction = sourceDirectoryFilterFunction;
         return this;
     }
 

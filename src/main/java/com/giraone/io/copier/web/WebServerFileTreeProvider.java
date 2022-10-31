@@ -35,6 +35,7 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
         this.rootUrl = rootUrl;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public WebServerFileTreeProvider withHttpClient(ReadFromUrlStreamProvider httpClient) {
         this.httpClient = httpClient;
         return this;
@@ -70,10 +71,18 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
             final URL childUrl = childUrl(url, child.getName(), child.isDirectory());
             final WebServerFile childFile = new WebServerFile(childUrl, child.getName(), child.isDirectory());
             final FileTree.FileTreeNode<WebServerFile> childFileTreeNode = new FileTree.FileTreeNode<>(childFile, fileTreeNode);
-            if (sourceFileFilterFunction == null || sourceFileFilterFunction.apply(childFile)) {
-                fileTreeNode.addChild(childFileTreeNode);
-                if (child.getType() == AutoIndexItemType.directory) {
+            if (child.getType() == AutoIndexItemType.directory) {
+                // Traverse child tree, if directory is not filtered
+                if (sourceTraverseFilterFunction == null || sourceTraverseFilterFunction.apply(childFile)) {
+                    // Add directory node to tree
+                    fileTreeNode.addChild(childFileTreeNode);
+                    // Provide tree for children
                     provideTreeFromAutoIndex(childUrl, childFileTreeNode);
+                }
+            } else {
+                // Add file node to tree, optionally filtered
+                if (sourceFileFilterFunction == null || sourceFileFilterFunction.apply(childFile)) {
+                    fileTreeNode.addChild(childFileTreeNode);
                 }
             }
         });

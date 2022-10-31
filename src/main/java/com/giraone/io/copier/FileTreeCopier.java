@@ -57,10 +57,9 @@ public class FileTreeCopier<T extends SourceFile> {
 
     protected CopierResult copy(FileTree<T> sourceTree) {
 
-        final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.traverse();
+        final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.getChildren();
         final CopierResult copierResult = new CopierResult();
         stream.forEach(node -> copy(node, copierResult));
-
         return copierResult;
     }
 
@@ -78,7 +77,7 @@ public class FileTreeCopier<T extends SourceFile> {
                 throw new RuntimeException("Cannot create temp directory \"" + targetFile + "\"!");
             }
             copierResult.directoryCreated();
-            node.traverse().forEach(childNode -> copy(childNode, copierResult));
+            node.getChildren().forEach(childNode -> copy(childNode, copierResult));
         } else {
             final URL url = node.getData().getUrl();
             try {

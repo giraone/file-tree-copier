@@ -11,12 +11,13 @@ Utility JAR for copying a file tree from web server or from classpath resource t
 ## Features
 
 - The source can be
-  - a web server serving files and directory listings with JSON based indexes, e.g. `nginx` with `auto-index: on`.
+  - a web server serving files and directory listings with JSON based indexes, e.g. `nginx` with `{ autoindex: on; autoindex_format json; }`.
   - a file tree within a resource folder of the running Java process, e.g. from a JAR
   - a file tree within the file system
 - When using an HTTP source, the used HTTP client can be configured. The default implementation is the native HTTP client
   of Java 11.
-- The source can be filtered, e.g. using a check for file name extensions.
+- The source can be filtered on files, e.g. using a check for file name extensions.
+- The source can be filtered on directories/folder, that should not be traversed, e.g. hidden directories, starting with a dot (.). 
 
 ## Usage
 
@@ -29,8 +30,8 @@ public class HowToCopy
         
         URL url = new URL("https://my-nginx-server/public/");
         WebServerFileTreeProvider source = new WebServerFileTreeProvider(url);
-        // Here: optional filter hidden directories
-        source.withDirectoryFilter(sourceDirectory -> !sourceDirectory.getName().startsWith("."));
+        // Here: optional filter to suppress traversal of hidden directories
+        source.withTraverseFilter(sourceDirectory -> !sourceDirectory.getName().startsWith("."));
         // Here: optional filter CSS files
         source.withFileFilter(sourceFile -> sourceFile.getName().endsWith(".css"));
         
