@@ -76,6 +76,7 @@ public class FileTreeCopier<T extends SourceFile> {
     protected void copyFlat(FileTree.FileTreeNode<T> node, CopierResult copierResult) {
         final T nodeData = node.getData();
         if (nodeData.isDirectory()) {
+            node.getChildren().forEach(childNode -> copyFlat(childNode, copierResult));
             return;
         }
         final File targetFile = new File(targetDirectory, nodeData.getName());
