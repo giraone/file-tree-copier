@@ -59,6 +59,8 @@ public class HowToCopy
         FileTreeCopier<ClassPathResourceFile> fileTreeCopier = new FileTreeCopier<>();
         fileTreeCopier.withFileTreeProvider(source);
         fileTreeCopier.withTargetDirectory(fontsDirectory);
+        // Flat copy mode
+        fileTreeCopier.withFlatCopy();
 
         int numberOfFilesCopied = fileTreeCopier.copy().getFilesCopied();
     }
