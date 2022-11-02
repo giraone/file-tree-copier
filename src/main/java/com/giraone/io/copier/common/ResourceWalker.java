@@ -10,8 +10,6 @@ import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
 import static com.giraone.io.copier.common.ResourceUtils.URL_PROTOCOL_JAR;
@@ -24,8 +22,6 @@ import static java.nio.file.FileSystems.getFileSystem;
 public class ResourceWalker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceWalker.class);
-
-    private static final ConcurrentMap<String, Object> locks = new ConcurrentHashMap<>();
 
     /**
      * Walk through a given resource tree. The walk always starts with the resource itself!
