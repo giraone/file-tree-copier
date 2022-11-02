@@ -74,7 +74,8 @@
     <java.version>${maven.compiler.source}</java.version>
     <!-- Production dependency versions -->
     <slf4j-api.version>2.0.3</slf4j-api.version>
-    <jackson.version>2.13.4</jackson.version>
+    <jackson.version>2.13.4.2</jackson.version>
+    <jackson-datatype-jsr310.version>2.13.4</jackson-datatype-jsr310.version>
     <!-- Test dependency versions -->
     <logback.version>1.4.4</logback.version>
     <junit.jupiter.version>5.9.1</junit.jupiter.version>
@@ -116,7 +117,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${jackson.version}</version>
+      <version>${jackson-datatype-jsr310.version}</version>
     </dependency>
 
     <!-- TEST -->
