@@ -154,6 +154,24 @@ class WebServerFileTreeProviderTest {
         assertThat(traverseList).hasSize(expectedFilesLevel2);
     }
 
+    @Test
+    void provideTreeFromAutoIndexWithFilterReturningNoData()
+        throws MalformedURLException {
+
+        // arrange
+        URL rootUrlHostAndPort = mockServerServingTree.getRootUrlHostAndPort();
+        String rootPath = "/provideTreeFromAutoIndexWithFilterReturningNoData/";
+        URL rootUrl = new URL(rootUrlHostAndPort + rootPath);
+        mockServerServingTree.createMockForAutoIndex(rootPath, 2, 2, 2);
+        WebServerFileTreeProvider fileTreeProvider = new WebServerFileTreeProvider(rootUrl);
+        fileTreeProvider.withFileFilter(sourceFile -> false);
+        // act
+        FileTree<WebServerFile> tree = fileTreeProvider.provideTree();
+        // assert
+        List<FileTree.FileTreeNode<WebServerFile>> traverseList = tree.getRecursiveFileList();
+        assertThat(traverseList).hasSize(0);
+    }
+
     @ParameterizedTest
     @CsvSource({
         "4,file1,1",
