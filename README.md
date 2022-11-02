@@ -1,5 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/giraone/file-tree-copier)](https://github.com/giraone/file-tree-copier/blob/master/LICENSE)
-[![Maven Central](https://img.shields.io/badge/Maven%20Central-1.0.0-blue)](https://mvnrepository.com/artifact/com.giraone.imaging/file-tree-copier)
+[![Maven Central](https://img.shields.io/badge/Maven%20Central-1.0.1-blue)](https://mvnrepository.com/artifact/com.giraone.imaging/file-tree-copier)
 [![GitHub issues](https://img.shields.io/github/issues/giraone/file-tree-copier)](https://github.com/giraone/file-tree-copier/issues)
 [![GitHub stars](https://img.shields.io/github/stars/giraone/file-tree-copier)](https://github.com/giraone/file-tree-copier/stargazers)
 [![Platform](https://img.shields.io/badge/platform-jre11%2B-blue)](https://github.com/giraone/file-tree-copier/pom.xml)
@@ -28,7 +28,7 @@ Utility JAR for copying a file tree from web server or from classpath resource t
     <dependency>
       <groupId>com.giraone.io</groupId>
       <artifactId>file-tree-copier</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 ```
 
