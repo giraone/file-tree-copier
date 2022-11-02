@@ -1,0 +1,11 @@
+version: "3.5"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ../src/test/resources/nginx.conf:/etc/nginx/nginx.conf
+      - ../src/test/resources/test-data:/usr/share/nginx/html:ro
