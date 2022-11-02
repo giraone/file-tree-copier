@@ -79,6 +79,20 @@ public class HowToCopy
 
 ## Build
 
+```script
+mvn package
+```
+
+## Test containers and docker
+
+The directory [nginx-docker](nginx-docker) contains a [docker-compose.yml](nginx-docker/docker-compose.yml) file
+to start a *NGINX* server with *autoindex* in JSON format enabled and serving the test file tree
+from [src/test/resources/test-data](src/test/resources/test-data).
+
+The docker-compose.yml is using the same [src/test/resources/nginx.conf](src/test/resources/nginx.conf)
+used within the integration test based on [testcontainers.org's NGINX module](https://www.testcontainers.org/modules/nginx/).
+The docker-compose.yml file can be used also with a *WebServerFileTreeProvider*, to show the working component.
+
 ## Release Notes
 
 - V1.0.1 (2022-11-02)
