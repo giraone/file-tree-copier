@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +109,7 @@ class FileTreeCopierTest {
         assertThat(copierResult.getDirectoriesCreated()).isEqualTo(2);
         assertThat(copierResult.getFilesCopied()).isEqualTo(6);
         assertThat(copierResult.getBytesCopied()).isEqualTo(86L);
+        assertThat(copierResult.getTotalTimeMillis()).isGreaterThan(0L);
 
         // clean up
         deleteDirectory(tmpDir);
@@ -151,6 +154,7 @@ class FileTreeCopierTest {
         assertThat(copierResult.getDirectoriesCreated()).isEqualTo(3);
         assertThat(copierResult.getFilesCopied()).isEqualTo(6);
         assertThat(copierResult.getBytesCopied()).isEqualTo(42L);
+        assertThat(copierResult.getTotalTimeMillis()).isGreaterThan(0L);
 
         // clean up
         deleteDirectory(tmpDir);
@@ -189,9 +193,41 @@ class FileTreeCopierTest {
         assertThat(copierResult.getDirectoriesCreated()).isEqualTo(0);
         assertThat(copierResult.getFilesCopied()).isEqualTo(6);
         assertThat(copierResult.getBytesCopied()).isEqualTo(42L);
+        assertThat(copierResult.getTotalTimeMillis()).isGreaterThan(0L);
 
         // clean up
         deleteDirectory(tmpDir);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false,1,1", // dir1 is created, because it has subdirectories, even if they have no files.
+        "true,0,0", // in flat mode, no directories and files should be created
+    })
+    void copyUsingClassPathFileTreeProviderAndNoData(boolean flatCopy, int expectedTopLevelNodes, int expectedDirectoriesCreated)
+        throws IOException {
+
+        // arrange
+        FileTreeCopier<ClassPathResourceFile> fileTreeCopier = new FileTreeCopier<>();
+        String resourcePath = "classpath:test-data/tree1";
+        ClassPathFileTreeProvider source = new ClassPathFileTreeProvider(resourcePath);
+        source.withFileFilter(sourceFile -> false);
+        fileTreeCopier.withFileTreeProvider(source);
+        File tmpDir = getTmpDirectory();
+        fileTreeCopier.withTargetDirectory(tmpDir);
+        if (flatCopy) {
+            fileTreeCopier.withFlatCopy();
+        }
+        // act
+        CopierResult copierResult = fileTreeCopier.copy();
+        // assert
+        assertThat(tmpDir.list()).hasSize(expectedTopLevelNodes);
+        assertThat(copierResult.getDirectoriesCreated()).isEqualTo(expectedDirectoriesCreated);
+        assertThat(copierResult.getFilesCopied()).isEqualTo(0);
+        assertThat(copierResult.getBytesCopied()).isEqualTo(0L);
+
+        // clean up
+        //deleteDirectory(tmpDir);
     }
 
     //------------------------------------------------------------------------------------------------------------------

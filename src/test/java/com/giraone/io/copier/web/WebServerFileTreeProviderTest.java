@@ -87,12 +87,12 @@ class WebServerFileTreeProviderTest {
         FileTree<WebServerFile> tree = fileTreeProvider.provideTree();
         // assert
         assertThat(tree).isNotNull();
-        List<FileTree.FileTreeNode<WebServerFile>> list1 = tree.getChildren().collect(Collectors.toList());
+        List<FileTree.FileTreeNode<WebServerFile>> list1 = tree.getChildrenNodesAsStream().collect(Collectors.toList());
         assertThat(list1).hasSize(expectedChildrenLevel1);
         int count = 0;
         for (FileTree.FileTreeNode<WebServerFile> item2 : list1) {
             if (item2.hasChildren()) {
-                List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.getChildren().collect(Collectors.toList());
+                List<FileTree.FileTreeNode<WebServerFile>> list2 = item2.getChildrenNodesAsStream().collect(Collectors.toList());
                 count += list2.size();
             }
         }
@@ -117,7 +117,7 @@ class WebServerFileTreeProviderTest {
         assertThat(fileTreeNode.getData()).isNotNull();
         assertThat(fileTreeNode.getData().getUrl()).isEqualTo(rootUrl);
         assertThat(fileTreeNode.getData().getName()).isNull();
-        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.getChildren().collect(Collectors.toList());
+        List<FileTree.FileTreeNode<WebServerFile>> rootList = fileTreeNode.getChildrenNodesAsStream().collect(Collectors.toList());
         assertThat(rootList).hasSize(1);
         FileTree.FileTreeNode<WebServerFile> dir1 = rootList.get(0);
         assertThat(dir1.getParent()).isNotNull();

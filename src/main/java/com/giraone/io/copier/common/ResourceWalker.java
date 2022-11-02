@@ -1,5 +1,8 @@
 package com.giraone.io.copier.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -16,8 +19,11 @@ import static java.nio.file.FileSystems.getFileSystem;
 
 /**
  * Helper to walk a resource (classpath) file system tree.
+ * See <a href="https://stackoverflow.com/questions/1429172/how-to-list-the-files-inside-a-jar-file">how-to-list-the-files-inside-a-jar-file</a>
  */
 public class ResourceWalker {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceWalker.class);
 
     private static final ConcurrentMap<String, Object> locks = new ConcurrentHashMap<>();
 
@@ -44,11 +50,13 @@ public class ResourceWalker {
         final URL url = ResourceUtils.getURL(resource);
         final URI uri = url.toURI();
         if (URL_PROTOCOL_JAR.equals(uri.getScheme())) {
+            LOGGER.debug("JAR URL \"{}\". Using safe walk.", uri);
             // final JarURLConnection connection = (JarURLConnection) url.openConnection();
             // final URL url2 = connection.getJarFileURL();
             // final URI uri2 = url2.toURI();
             safeWalkJar(resource, uri, maxDepth, consumer);
         } else {
+            LOGGER.debug("Non-JAR URL \"{}\". Using normal walk.", uri);
             File file = new File(uri);
             if (file.exists()) {
                 final Path path = file.toPath();
@@ -63,29 +71,10 @@ public class ResourceWalker {
 
     private void safeWalkJar(String resource, URI uri, int maxDepth, Consumer<File> consumer) throws Exception {
 
-        synchronized (getLock(uri)) {
-            try (FileSystem fs = getFileSystem(uri)) {
-                Files.walk(fs.getPath(resource), maxDepth)
-                    .map(Path::toFile)
-                    .forEach(consumer);
-            }
+        try (FileSystem fs = getFileSystem(uri)) {
+            Files.walk(fs.getPath(resource), maxDepth)
+                .map(Path::toFile)
+                .forEach(consumer);
         }
-    }
-
-    private Object getLock(URI uri) {
-
-        String fileName = parseFileName(uri);
-        locks.computeIfAbsent(fileName, s -> new Object());
-        return locks.get(fileName);
-    }
-
-    private String parseFileName(URI uri) {
-
-        final String schemeSpecificPart = uri.getSchemeSpecificPart();
-        final int i = schemeSpecificPart.indexOf("!");
-        if (i == -1) {
-            throw new IllegalArgumentException("URI \"" + uri + "\" is not a JAR URI!");
-        }
-        return schemeSpecificPart.substring(0, i);
     }
 }

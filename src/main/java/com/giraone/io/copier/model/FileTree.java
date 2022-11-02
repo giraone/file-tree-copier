@@ -14,8 +14,8 @@ public class FileTree<T extends SourceFile> {
         this.root = root;
     }
 
-    public Stream<FileTreeNode<T>> getChildren() {
-        return root.getChildren();
+    public Stream<FileTreeNode<T>> getChildrenNodesAsStream() {
+        return root.getChildrenNodesAsStream();
     }
 
     /**
@@ -58,9 +58,9 @@ public class FileTree<T extends SourceFile> {
             return children != null;
         }
 
-        public Stream<FileTreeNode<T>> getChildren() {
+        public Stream<FileTreeNode<T>> getChildrenNodesAsStream() {
             if (children == null) {
-                throw new IllegalStateException("Node has " + data + " has no children!");
+                throw new IllegalStateException("Node has " + data + " has no children. Check using hasChildren first!");
             }
             return children.stream();
         }

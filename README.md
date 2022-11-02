@@ -81,5 +81,9 @@ public class HowToCopy
 
 ## Release Notes
 
+- V1.0.1 (2022-11-02)
+  - Refactoring (getChildren to getChildrenNodesAsStream)
+  - Bugfix and tests for handling directories with no data
+  - Upgrade of `com.fasterxml.jackson.core:jackson-databind`
 - V1.0.0 (2022-10-25)
   - Initial version

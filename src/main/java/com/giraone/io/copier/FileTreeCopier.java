@@ -10,6 +10,10 @@ import java.util.stream.Stream;
 
 /**
  * Utility class for copying a file tree from web server or from classpath resource to a (local) file system.
+ * Hints:
+ * <ul>
+ *     <li>Copying will not create subdirectories, that are totally empty (no directories, no files)</li>
+ * </ul>
  *
  * @param <T> the file tree node implementation
  */
@@ -28,6 +32,7 @@ public class FileTreeCopier<T extends SourceFile> {
      * @param fileTreeProvider FileTreeProvider implementation
      * @return this
      */
+    @SuppressWarnings("UnusedReturnValue")
     public FileTreeCopier withFileTreeProvider(FileTreeProvider<T> fileTreeProvider) {
         this.fileTreeProvider = fileTreeProvider;
         return this;
@@ -39,6 +44,7 @@ public class FileTreeCopier<T extends SourceFile> {
      * @param targetDirectory the target directory, that must exists
      * @return this
      */
+    @SuppressWarnings("UnusedReturnValue")
     public FileTreeCopier withTargetDirectory(File targetDirectory) {
         if (targetDirectory == null) {
             throw new IllegalArgumentException("Target directory cannot be null!");
@@ -53,30 +59,36 @@ public class FileTreeCopier<T extends SourceFile> {
         return this;
     }
 
-    public void withFlatCopy() {
+    @SuppressWarnings("UnusedReturnValue")
+    public FileTreeCopier withFlatCopy() {
         this.flatCopy = true;
+        return this;
     }
 
     public CopierResult copy() {
-        FileTree<T> sourceTree = this.fileTreeProvider.provideTree();
-        return copy(sourceTree);
+        final CopierResult copierResult = new CopierResult();
+        final FileTree<T> sourceTree = this.fileTreeProvider.provideTree();
+        copierResult.finishedProvide();
+        return copy(sourceTree, copierResult);
     }
 
-    protected CopierResult copy(FileTree<T> sourceTree) {
-        final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.getChildren();
-        final CopierResult copierResult = new CopierResult();
+    protected CopierResult copy(FileTree<T> sourceTree, CopierResult copierResult) {
+        final Stream<FileTree.FileTreeNode<T>> stream = sourceTree.getChildrenNodesAsStream();
         if (this.flatCopy) {
             stream.forEach(node -> copyFlat(node, copierResult));
         } else {
             stream.forEach(node -> copy(node, copierResult));
         }
+        copierResult.finishedCopy();
         return copierResult;
     }
 
     protected void copyFlat(FileTree.FileTreeNode<T> node, CopierResult copierResult) {
         final T nodeData = node.getData();
         if (nodeData.isDirectory()) {
-            node.getChildren().forEach(childNode -> copyFlat(childNode, copierResult));
+            if (node.hasChildren()){
+                node.getChildrenNodesAsStream().forEach(childNode -> copyFlat(childNode, copierResult));
+            }
             return;
         }
         final File targetFile = new File(targetDirectory, nodeData.getName());
@@ -98,12 +110,15 @@ public class FileTreeCopier<T extends SourceFile> {
         }
         final File targetFile = new File(targetDirectory, targetFilePath);
         if (nodeData.isDirectory()) {
-            boolean ok = targetFile.mkdir();
-            if (!ok) {
-                throw new RuntimeException("Cannot create temp directory \"" + targetFile + "\"!");
+            if (node.hasChildren()) {
+                // Create a directory only, when there are children
+                boolean ok = targetFile.mkdir();
+                if (!ok) {
+                    throw new RuntimeException("Cannot create temp directory \"" + targetFile + "\"!");
+                }
+                copierResult.directoryCreated();
+                node.getChildrenNodesAsStream().forEach(childNode -> copy(childNode, copierResult));
             }
-            copierResult.directoryCreated();
-            node.getChildren().forEach(childNode -> copy(childNode, copierResult));
         } else {
             final URL url = node.getData().getUrl();
             try {
