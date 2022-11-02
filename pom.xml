@@ -81,6 +81,7 @@
     <junit.jupiter.version>5.9.1</junit.jupiter.version>
     <assertj.version>3.23.1</assertj.version>
     <mockserver-netty.version>5.14.0</mockserver-netty.version>
+    <testcontainers.version>1.17.5</testcontainers.version>
     <!-- Plugin versions -->
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -152,6 +153,19 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- for testing with test containers (nginx ) -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>nginx</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- Web server mocking -->
