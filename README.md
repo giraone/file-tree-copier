@@ -79,11 +79,20 @@ public class HowToCopy
 
 ## Build
 
+The project uses "normal" unit tests, with [mock-server](https://www.mock-server.com/) and also
+*integration tests* with [TestContainers](https://www.testcontainers.org/) ("Real" *nginx* via *Docker* or *Podman*). 
+
 ```script
 mvn package
 ```
 
-## Test containers and docker
+If there is no *Docker* or *Podman* for [TestContainers](https://www.testcontainers.org/):
+
+```script
+mvn -DskipITs package
+```
+
+### Test containers and docker/podman
 
 The directory [nginx-docker](nginx-docker) contains a [docker-compose.yml](nginx-docker/docker-compose.yml) file
 to start a *NGINX* server with *autoindex* in JSON format enabled and serving the test file tree

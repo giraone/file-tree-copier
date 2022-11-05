@@ -4,12 +4,12 @@ import com.giraone.io.copier.common.IoStreamUtils;
 import com.giraone.io.copier.model.FileTree;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.NginxContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,20 +26,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Testing with a real NGINX via org.testcontainers.
  */
-@Disabled
 public class WebServerFileTreeProviderIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebServerFileTreeProviderIT.class);
-
-    private final static String NGINX_IMAGE_NAME = "nginx:1.23.2";
-
+    private final static DockerImageName CONTAINER_IMAGE = DockerImageName.parse("nginx:1.23.2");
     private static NginxContainer<?> container;
 
     @BeforeAll
     @SuppressWarnings("resource")
     static void setup() {
 
-        container = new NginxContainer<>(NGINX_IMAGE_NAME)
+        container = new NginxContainer<>(CONTAINER_IMAGE)
 
             // .withCopyFileToContainer(MountableFile.forHostPath("src/test/resources/test-data"), "/usr/share/nginx/html")
             .withClasspathResourceMapping("test-data", "/usr/share/nginx/html", BindMode.READ_ONLY)
@@ -57,16 +54,17 @@ public class WebServerFileTreeProviderIT {
 
         if (!container.isRunning()) {
             container.start();
-        }
-        if (LOGGER.isDebugEnabled()) {
-            URL baseUrl;
-            try {
-                baseUrl = container.getBaseUrl("http", 80);
-                LOGGER.debug("NGINX base URL = {}", baseUrl);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(container.getLogs());
+                URL baseUrl;
+                try {
+                    baseUrl = container.getBaseUrl("http", 80);
+                    LOGGER.debug("NGINX base URL = {}", baseUrl);
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
-            LOGGER.debug(container.getLogs());
         }
     }
 
