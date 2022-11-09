@@ -94,7 +94,7 @@ public class WebServerFileTreeProvider extends AbstractFileTreeProvider<WebServe
         try {
             return autoIndexReader.read(in);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading index for URL \"" + url + "\"!");
         }
     }
 
