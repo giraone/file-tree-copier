@@ -20,7 +20,9 @@ public class AutoIndexReader {
     }
 
     public List<AutoIndexItem> read(InputStream in) throws IOException {
-        return objectMapper.readValue(in, listAutoIndexItemTypeRef);
+
+        final byte[] content = in.readAllBytes();
+        return objectMapper.readValue(content, listAutoIndexItemTypeRef);
     }
 
     private static ObjectMapper buildObjectMapper() {
