@@ -38,16 +38,15 @@ public class WebServerFileTreeProviderIT {
 
         container = new NginxContainer<>(CONTAINER_IMAGE)
 
-            // .withCopyFileToContainer(MountableFile.forHostPath("src/test/resources/test-data"), "/usr/share/nginx/html")
-            .withClasspathResourceMapping("test-data", "/usr/share/nginx/html", BindMode.READ_ONLY)
-
-            // .withCopyFileToContainer(MountableFile.forHostPath("src/test/resources/nginx.conf"), "/etc/nginx/nginx.conf")
             .withClasspathResourceMapping("nginx.conf", "/etc/nginx/nginx.conf", BindMode.READ_ONLY)
+            .withFileSystemBind("src/test/resources/test-data", "/usr/share/nginx/html", BindMode.READ_ONLY)
+            // NOT with rootless podman! That is why, we use withFileSystemBind above
+            //.withClasspathResourceMapping("test-data", "/usr/share/nginx/html", BindMode.READ_ONLY)
 
             // .withReuse(true)
 
             // See https://www.testcontainers.org/features/startup_and_waits/
-            .withExposedPorts(80) // waiting for the exposed port to start listening
+            // .withExposedPorts(80) // waiting for the exposed port to start listening
             // .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS)) // 60 is the default
             // .waitingFor(Wait.forHttp("/"))
         ;
@@ -55,7 +54,6 @@ public class WebServerFileTreeProviderIT {
         if (!container.isRunning()) {
             container.start();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(container.getLogs());
                 URL baseUrl;
                 try {
                     baseUrl = container.getBaseUrl("http", 80);
@@ -63,7 +61,7 @@ public class WebServerFileTreeProviderIT {
                 } catch (MalformedURLException e) {
                     throw new RuntimeException(e);
                 }
-
+                LOGGER.debug(container.getLogs());
             }
         }
     }
@@ -76,6 +74,11 @@ public class WebServerFileTreeProviderIT {
                 container.stop();
             }
         }
+    }
+
+    @Test
+    void health() throws IOException {
+        checkThatFileStartsWith("/health", "up");
     }
 
     @Test
@@ -101,7 +104,9 @@ public class WebServerFileTreeProviderIT {
         URL url0 = traverseList.get(0).getData().getUrl();
         URL url1 = traverseList.get(1).getData().getUrl();
         String checksum0 = IoStreamUtils.calculateChecksumString(digest, url0.openStream());
+        LOGGER.debug("Request to {} returned checksum {}", url0, checksum0);
         String checksum1 = IoStreamUtils.calculateChecksumString(digest, url1.openStream());
+        LOGGER.debug("Request to {} returned checksum {}", url1, checksum1);
         assertThat(checksum0).isEqualTo("13d64eddbc87182428e2ecae7a1f40685fe1232ffc96748ee394e8ac2df3f4e1");
         assertThat(checksum1).isEqualTo("84a4da0e4c52c469ace6e0c674a9144cd43eb2628c401c8b56b41242e2be4af1");
     }
